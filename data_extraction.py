@@ -6,9 +6,9 @@ import tabula
 
 class DataExtractor():
     def read_rds_table (self,dbcon = DatabaseConnector()):
-        eng = dbcon.init_db_engine()
-        user_tb = dbcon.list_db_tables()
-        users = pd.read_sql_table(user_tb[1],eng)
-        print (users)
+        engine = dbcon.init_db_engine()
+        tables = dbcon.list_db_tables()
+        user_table_df= pd.read_sql_table(tables[1],engine)
+        return user_table_df
 
  

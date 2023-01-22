@@ -19,8 +19,8 @@ class DatabaseConnector():
     def  list_db_tables (self):
         engine = self.init_db_engine()
         inspector = inspect(engine)
-        for table in inspector.get_table_names():
-            print(table)
+        for tables in inspector.get_table_names():
+            print(tables)
 
 readyaml = DatabaseConnector()
 print(readyaml.list_db_tables())
