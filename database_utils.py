@@ -2,8 +2,8 @@ import yaml
 from sqlalchemy import create_engine
 from sqlalchemy import inspect
 from sqlalchemy.engine.url import URL
-from data_cleaning import DataClean
-from data_extraction import DataExtractor
+import data_cleaning
+import data_extraction
 
 
 class DatabaseConnector():
@@ -39,9 +39,6 @@ class DatabaseConnector():
         DATABASE = 'Sales_Data'
         PORT = 5432
         engine = create_engine(f"{DATABASE_TYPE}+{DBAPI}://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}")
-        self.df.to_sql('dim_users', engine, if_exists='replace')
+        return data_frame.to_sql(table_name, engine, if_exists='replace')
 
 
-conn_instance = DatabaseConnector()
-extraction_instance = DataExtractor()
-clean_instance = DataClean()
