@@ -1,6 +1,9 @@
 import yaml
 from sqlalchemy import create_engine
 from sqlalchemy import inspect
+from sqlalchemy.engine.url import URL
+from data_cleaning import DataClean
+from data_extraction import DataExtractor
 
 
 class DatabaseConnector():
@@ -19,8 +22,26 @@ class DatabaseConnector():
     def  list_db_tables (self):
         engine = self.init_db_engine()
         inspector = inspect(engine)
-        for tables in inspector.get_table_names():
-            print(tables)
+        tables = inspector.get_table_names()
+        return tables
+         
 
-readyaml = DatabaseConnector()
-print(readyaml.list_db_tables())
+ 
+#readyaml = DatabaseConnector()
+#print(readyaml.list_db_tables())
+     
+    def upload_to_db(self, data_frame, table_name):
+        DATABASE_TYPE = 'postgresql'
+        DBAPI = 'psycopg2'
+        HOST = 'localhost'
+        USER = 'postgres'
+        PASSWORD = 'Harish2001'
+        DATABASE = 'Sales_Data'
+        PORT = 5432
+        engine = create_engine(f"{DATABASE_TYPE}+{DBAPI}://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}")
+        self.df.to_sql('dim_users', engine, if_exists='replace')
+
+
+conn_instance = DatabaseConnector()
+extraction_instance = DataExtractor()
+clean_instance = DataClean()
