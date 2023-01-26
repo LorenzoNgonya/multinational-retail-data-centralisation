@@ -1,7 +1,6 @@
 import yaml
 from database_utils import DatabaseConnector
 import pandas as pd
-from sqlalchemy import create_engine, MetaData, Table
 import tabula
 
 class DataExtractor():
