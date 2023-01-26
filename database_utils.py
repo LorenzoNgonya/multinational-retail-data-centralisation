@@ -1,7 +1,8 @@
 import yaml
 from sqlalchemy import create_engine
 from sqlalchemy import inspect
-from sqlalchemy.engine.url import URL
+import psycopg2
+import sqlalchemy
 import data_cleaning
 import data_extraction
 
@@ -15,27 +16,36 @@ class DatabaseConnector():
 
     def init_db_engine(self):
         data = self.read_db_creds()
-        engine = create_engine(f"{'postgresql'}+{'psycopg2'}://{data['RDS_USER']}:{data['RDS_PASSWORD']}@{data['RDS_HOST']}:{data['RDS_PORT']}/{data['RDS_DATABASE']}")
+        
+        DATABASE_TYPE = 'postgresql'
+        DBAPI = 'psycopg2'
+        HOST = data['RDS_HOST']
+        USER = data['RDS_USER']
+        PASSWORD = data['RDS_PASSWORD']
+        DATABASE = data['RDS_DATABASE']
+        PORT = data['RDS_PORT']
+
+        engine = create_engine(f"{DATABASE_TYPE}+{DBAPI}://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}")
         return engine
 
     
     def  list_db_tables (self):
         engine = self.init_db_engine()
         inspector = inspect(engine)
-        tables = inspector.get_table_names()
-        return tables
+        table_names = inspector.get_table_names()
+        return table_names
          
 
  
 #readyaml = DatabaseConnector()
 #print(readyaml.list_db_tables())
      
-    def upload_to_db(self, data_frame, table_name):
+    #def upload_to_db(self, data_frame, table_name):
         DATABASE_TYPE = 'postgresql'
         DBAPI = 'psycopg2'
         HOST = 'localhost'
         USER = 'postgres'
-        PASSWORD = 'Harish2001'
+        PASSWORD = 'Lorenzo97='
         DATABASE = 'Sales_Data'
         PORT = 5432
         engine = create_engine(f"{DATABASE_TYPE}+{DBAPI}://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}")
