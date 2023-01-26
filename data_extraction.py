@@ -1,7 +1,6 @@
-import yaml
 from database_utils import DatabaseConnector
 import pandas as pd
-import tabula
+#import tabula
 
 class DataExtractor():
     def extract_rds_table(self, table_name):
@@ -16,3 +15,4 @@ class DataExtractor():
         
          return pdf_data
         
+DataExtractor()

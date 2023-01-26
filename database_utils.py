@@ -1,10 +1,10 @@
 import yaml
 from sqlalchemy import create_engine
 from sqlalchemy import inspect
-import psycopg2
-import sqlalchemy
-import data_cleaning
-import data_extraction
+from data_cleaning import DataClean
+from data_extraction import DataExtractor
+import pandas as pd
+
 
 
 class DatabaseConnector():
@@ -35,20 +35,18 @@ class DatabaseConnector():
         table_names = inspector.get_table_names()
         return table_names
          
-
- 
-#readyaml = DatabaseConnector()
-#print(readyaml.list_db_tables())
      
-    #def upload_to_db(self, data_frame, table_name):
-        DATABASE_TYPE = 'postgresql'
-        DBAPI = 'psycopg2'
-        HOST = 'localhost'
-        USER = 'postgres'
-        PASSWORD = 'Lorenzo97='
-        DATABASE = 'Sales_Data'
-        PORT = 5432
-        engine = create_engine(f"{DATABASE_TYPE}+{DBAPI}://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}")
-        return data_frame.to_sql(table_name, engine, if_exists='replace')
+    def upload_to_db(self, data_frame, table_name):
+     
+     
+     DATABASE_TYPE = 'postgresql'  
+     DBAPI = 'psycopg2'
+     HOST = 'localhost'
+     PASSWORD = 'Lorenzo97='
+     USER = 'postgres'
+     DATABASE = 'Sales_Data'
+     PORT = 5432
+     engine = create_engine(f"{DATABASE_TYPE}+{DBAPI}://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}")
+     return data_frame.to_sql(table_name, engine, if_exists='replace')
 
 
