@@ -1,10 +1,10 @@
-from database_utils import DatabaseConnector
 import pandas as pd
-#import tabula
+
 
 class DataExtractor():
-    def extract_rds_table(self, table_name):
-         engine = DatabaseConnector.init_db_engine()
+    def extract_rds_table(table_name):
+         import database_utils
+         engine = database_utils.DatabaseConnector
          df = pd.read_sql_table(engine, table_name)
          return df
 
@@ -15,4 +15,3 @@ class DataExtractor():
         
          return pdf_data
         
-DataExtractor()

@@ -1,10 +1,9 @@
 import yaml
 from sqlalchemy import create_engine
 from sqlalchemy import inspect
-from data_cleaning import DataClean
-from data_extraction import DataExtractor
 import pandas as pd
-
+import data_cleaning
+import data_extraction
 
 
 class DatabaseConnector():
@@ -32,7 +31,7 @@ class DatabaseConnector():
     def  list_db_tables (self):
         engine = self.init_db_engine()
         inspector = inspect(engine)
-        table_names = inspector.get_table_names()
+        table_names = inspector.get_table_names("")
         return table_names
          
      
@@ -48,5 +47,6 @@ class DatabaseConnector():
      PORT = 5432
      engine = create_engine(f"{DATABASE_TYPE}+{DBAPI}://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}")
      return data_frame.to_sql(table_name, engine, if_exists='replace')
+
 
 

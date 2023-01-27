@@ -1,9 +1,10 @@
 import pandas as pd
-from data_extraction import DataExtractor
+
 
 class DataClean():
-    def clean_user_data(self, df):
-        df = DataExtractor().extract_rds_table('legacy_users')
+    def clean_user_data(df):
+        import data_extraction
+        df = data_extraction.DataExtractor
         df['date_of_birth'] = pd.to_datetime(df['date_of_birth'],  infer_datetime_format=True, errors='coerce')
         df['join_date'] = pd.to_datetime(df['join_date'], infer_datetime_format=True, errors='coerce')
         print(df['date_of_birth'])
@@ -11,6 +12,6 @@ class DataClean():
 
         return df
 
-DataClean()
+
         
    
