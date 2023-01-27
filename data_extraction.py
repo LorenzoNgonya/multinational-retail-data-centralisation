@@ -1,10 +1,9 @@
 import pandas as pd
 
-
 class DataExtractor():
-    def extract_rds_table(table_name):
+    def extract_rds_table(self, table_name):
          import database_utils
-         engine = database_utils.DatabaseConnector
+         engine = database_utils.DatabaseConnector.init_db_engine
          df = pd.read_sql_table(engine, table_name)
          return df
 

@@ -35,7 +35,7 @@ class DatabaseConnector():
         return table_names
          
      
-    def upload_to_db(self, data_frame, table_name):
+    def upload_to_db(self, data_frame):
      
      
      DATABASE_TYPE = 'postgresql'  
@@ -46,7 +46,11 @@ class DatabaseConnector():
      DATABASE = 'Sales_Data'
      PORT = 5432
      engine = create_engine(f"{DATABASE_TYPE}+{DBAPI}://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}")
-     return data_frame.to_sql(table_name, engine, if_exists='replace')
-
-
-
+     data_frame.to_sql('dim_users', engine, if_exists='replace')
+     
+conn_instance = DatabaseConnector()
+extraction_instance = data_extraction.DataExtractor()
+clean_instance = data_cleaning.DataClean()
+conn_instance
+extraction_instance
+clean_instance
