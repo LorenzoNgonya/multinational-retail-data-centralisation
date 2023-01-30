@@ -1,9 +1,10 @@
 import yaml
 from sqlalchemy import create_engine
 from sqlalchemy import inspect
+import pandas as pd
 import data_cleaning
 import data_extraction
-import pandas as pd
+
 
 
 class DatabaseConnector():
@@ -33,7 +34,7 @@ class DatabaseConnector():
         inspector = inspect(engine)
         table_names = inspector.get_table_names()
         return table_names
-         
+      
      
     def upload_to_db (self, data_frame):
      DATABASE_TYPE = 'postgresql'  
@@ -47,5 +48,4 @@ class DatabaseConnector():
      data_frame.to_sql('dim_users', engine, if_exists='replace')
      
 conn_instance = DatabaseConnector()
-extraction_instance = data_extraction.DataExtractor()
-clean_instance = data_cleaning.DataClean()
+extraction_instance = data_extraction.DataExtractor()#clean_instance = data_cleaning.DataClean()
