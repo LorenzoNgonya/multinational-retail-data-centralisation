@@ -1,19 +1,39 @@
-import pandas as pd
 from database_utils import DatabaseConnector
-class DataExtractor():
-    def extract_rds_table(self, table_name):
-         DatabaseConnector.read_db_creds(self, creds=any )
-         engine = DatabaseConnector.init_db_engine(self, creds=any)
-         #df = pd.read_sql_table(table_name,con = engine)
-         print (engine)
-         #return df
+from sqlalchemy import create_engine
+from sqlalchemy import inspect
+import pandas as pd
+class DataExtractor:
+    def list_db_tables(self):
+        database =DatabaseConnector().init_db_engine()
+        for table in database:
+            print(table)
+        return database
+# Step 5
+    def read_rds_table(self,table_name):
+        engine_information = DatabaseConnector().read_db_creds()
 
-    #def retrieve_pdf_data(self, link):
+        # RDS_HOST: data-handling-project-readonly.cq2e8zno855e.eu-west-1.rds.amazonaws.com
+        # RDS_PASSWORD: AiCore2022
+        # RDS_USER: aicore_admin
+        # RDS_DATABASE: postgres
+        # RDS_PORT: 5432
 
-         #Read remote pdf into list of DataFrame
-         #pdf_data = tabula.read_pdf(link, pages='all')#returns a list of data frames
-        
-         #return pdf_data
-        
-extraction_instance = DataExtractor()
-extraction_instance.extract_rds_table(table_name='L')
+        DATABASE_TYPE = 'postgresql'
+        DBAPI = 'psycopg2'
+        HOST = engine_information['RDS_HOST']
+        USER = engine_information['RDS_USER']
+        PASSWORD = engine_information['RDS_PASSWORD']
+        DATABASE = engine_information['RDS_DATABASE']
+        PORT = 5432
+        engine = create_engine(f"{DATABASE_TYPE}+{DBAPI}://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}")
+        engine = engine.connect()
+        inspector = inspect(engine)
+        # names = inspector.get_table_names()
+        # print(names)
+        # engine.execute('''SELECT * FROM legacy_users''').fetchall()
+        table = pd.read_sql_table(table_name,engine)
+        print(table.head(10))
+        return table
+
+if __name__ == '__main__':
+     ex = DataExtractor()

@@ -1,49 +1,39 @@
 import yaml
-from sqlalchemy import create_engine, MetaData
-from sqlalchemy import inspect
 import psycopg2
-
-
-
-
-
+from sqlalchemy import create_engine
+from sqlalchemy import inspect
+#Step 4
 class DatabaseConnector:
-    def read_db_creds(self,creds):
-        creds = 'db_creds.yaml'
-        with open(creds, "r") as file:
-            data = yaml.safe_load(file)
-        print (data)
+    def __init__(self):
+        pass
+    def read_db_creds(self):
+        with open('db_creds.yaml') as f:
+            data = yaml.safe_load(f)
         return data
+    def init_db_engine(self):
+        credentials = self.read_db_creds()
+        with psycopg2.connect(host=credentials['RDS_HOST'], user=credentials['RDS_USER'], password=credentials['RDS_PASSWORD'], dbname=credentials['RDS_DATABASE'], port=credentials['RDS_PORT']) as conn:
+            with conn.cursor() as cur:
+                cur.execute("""SELECT table_name FROM information_schema.tables
+                WHERE table_schema = 'public'""")
+                records = cur.fetchall()
+                # for table in records:
+                #     print(table)
 
-    def init_db_engine(self, creds):
-        data = self.read_db_creds(creds) 
+        return records
+
+    def upload_to_db(self,DataFrame,dataname):
+        DATABASE_TYPE = 'postgresql'
+        DBAPI = 'psycopg2'
+        HOST = 'localhost'
+        USER = 'postgres'
+        PASSWORD = 'gangxinli'
+        DATABASE = 'postgres'
+        PORT = 5432
+        engine = create_engine(f"{DATABASE_TYPE}+{DBAPI}://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}")
+        engine = engine.connect() 
         
-        url =f"postgresql+{DBAPI}://{data['RDS_USER']}:{data['RDS_PASSWORD']}@{data['RDS_HOST']}:{data['RDS_PORT']}/{data['RDS_DATABASE']}" 
-        engine = create_engine(url, echo=False)
-        metadata = MetaData(bind=engine)
-        db_engine = engine
-        #print(engine)
-        return db_engine  
-
-    
-    def  list_db_tables (self,engine):
-        inspector = inspect(engine)
-        table_names = inspector.get_table_names()
-        print (table_names)
-        return table_names
-      
-     
-    def upload_to_db (self, data_frame):
-     DATABASE_TYPE = 'postgresql'  
-     DBAPI = 'psycopg2'
-     HOST = 'localhost'
-     PASSWORD = 'Lorenzo97='
-     USER = 'postgres'
-     DATABASE = 'Sales_Data'
-     PORT = 5432
-     engine = create_engine(f"{DATABASE_TYPE}+{DBAPI}://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}")
-     data_frame.to_sql('dim_users', engine, if_exists='replace')
-     
-#conn_instance = DatabaseConnector()
-#extraction_instance = data_extraction.DataExtractor()
-#clean_instance = data_cleaning.DataClean()
+        DataFrame.to_sql(dataname,engine,if_exists='append')
+        
+if __name__ == "__main__":
+    DB = DatabaseConnector()
