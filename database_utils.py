@@ -1,5 +1,5 @@
 import yaml
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, MetaData
 from sqlalchemy import inspect
 import psycopg2
 
@@ -18,16 +18,12 @@ class DatabaseConnector:
     def init_db_engine(self, creds):
         data = self.read_db_creds(creds) 
         
-        DATABASE_TYPE = 'postgresql'
-        DBAPI = 'psycopg2'
-        HOST = data['RDS_HOST']
-        USER = data['RDS_USER']
-        PASSWORD = data['RDS_PASSWORD']
-        DATABASE = data['RDS_DATABASE']
-        PORT = data['RDS_PORT']
-
-        engine = create_engine(f"{DATABASE_TYPE}+{DBAPI}://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}")
-        return engine
+        url =f"postgresql+{DBAPI}://{data['RDS_USER']}:{data['RDS_PASSWORD']}@{data['RDS_HOST']}:{data['RDS_PORT']}/{data['RDS_DATABASE']}" 
+        engine = create_engine(url, echo=False)
+        metadata = MetaData(bind=engine)
+        db_engine = engine
+        #print(engine)
+        return db_engine  
 
     
     def  list_db_tables (self,engine):

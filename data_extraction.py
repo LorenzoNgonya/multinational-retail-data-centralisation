@@ -2,9 +2,8 @@ import pandas as pd
 from database_utils import DatabaseConnector
 class DataExtractor():
     def extract_rds_table(self, table_name):
-         creds = DatabaseConnector.read_db_creds(creds) 
-         DatabaseConnector.read_db_creds(self, creds)
-         engine = DatabaseConnector.init_db_engine(self, creds)
+         DatabaseConnector.read_db_creds(self, creds=any )
+         engine = DatabaseConnector.init_db_engine(self, creds=any)
          #df = pd.read_sql_table(table_name,con = engine)
          print (engine)
          #return df
