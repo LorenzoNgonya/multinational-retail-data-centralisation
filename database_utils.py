@@ -3,7 +3,7 @@ import psycopg2
 import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy import inspect
-#Step 4
+
 class DatabaseConnector:
     def __init__(self):
         pass
@@ -24,6 +24,10 @@ class DatabaseConnector:
         inspector = inspect(eng)
         return inspector.get_table_names()     
 
+    def upload_to_db(self, df,table):
+        df = DataExtractor.read_rds_table('legacy_users')
+        df.to_sql(table,'dim_users')
+
 
 if __name__ == "__main__":
     db = DatabaseConnector()
@@ -31,3 +35,4 @@ if __name__ == "__main__":
     db.init_db_engine()
     tables = db.list_db_tables()
     print(tables)
+    db.upload_to_db(df, table='legacy_users')
