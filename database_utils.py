@@ -24,9 +24,26 @@ class DatabaseConnector:
         inspector = inspect(eng)
         return inspector.get_table_names()     
 
-    def upload_to_db(self, df,table):
-        df = DataExtractor.read_rds_table('legacy_users')
-        df.to_sql(table,'dim_users')
+    def local_connection(self):
+        newconn_str = 'postgresql://{user}:{password}@{host}:{port}/{database}'.format(
+            user='postgres',
+            password='Lorenzo97=',
+            host='localhost',
+            port='5432',
+            database='Sales_Data'
+        )
+        engine = create_engine(newconn_str)
+        return engine
+
+
+    def upload_to_db(self,table_name, df, connection_type = 'local'):
+        if connection_type == 'local':
+            engine = self.local_connection()
+        else:
+            engine = self.init_db_engine()
+
+        df.to_sql(table_name, engine, if_exists = 'append')
+        
 
 
 if __name__ == "__main__":
@@ -35,4 +52,4 @@ if __name__ == "__main__":
     db.init_db_engine()
     tables = db.list_db_tables()
     print(tables)
-    db.upload_to_db(df, table='legacy_users')
+   

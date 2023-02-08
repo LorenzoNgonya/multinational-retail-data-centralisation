@@ -1,5 +1,6 @@
 import pandas as pd
 from data_extraction import DataExtractor
+from database_utils import DatabaseConnector
 
 class DataCleaning():
     def __init__(self) -> None:
@@ -32,8 +33,14 @@ class DataCleaning():
 
         print(table['country'].unique())
         print(table)
+        
+        db_conn = DatabaseConnector()
+        db_conn.upload_to_db(table,'dim_users')
+        
 
 if __name__ == "__main__":
     clean = DataCleaning()
     clean.clean_user_data()
+    
+    
     
