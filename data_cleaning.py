@@ -35,7 +35,7 @@ class DataCleaning():
         print(table)
         
         db_conn = DatabaseConnector()
-        db_conn.upload_to_db(table,'dim_users')
+        db_conn.upload_to_db('dim_users', table)
         
 
 if __name__ == "__main__":
