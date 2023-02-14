@@ -36,6 +36,12 @@ class DataCleaning():
         
         db_conn = DatabaseConnector()
         db_conn.upload_to_db('dim_users', table)
+
+        def clean_card_data(self):
+            file = DataExtractor().retreve_pdf_data()
+            table = pd.DataFrame()
+            for item in file:
+                table = pd.concat([table, item],ignore_index=True)
         
 
 if __name__ == "__main__":
