@@ -1,7 +1,7 @@
 from database_utils import DatabaseConnector
-from sqlalchemy import create_engine
-from sqlalchemy import inspect
 import pandas as pd
+import tabula
+
 class DataExtractor:
     def read_rds_table(self, db_con = DatabaseConnector()):
      engine1 = db_con.init_db_engine()
@@ -10,6 +10,13 @@ class DataExtractor:
      print(user.head)
      return user
 
+    def retrieve_pdf_data(self,link):
+        link = 'https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf'
+        dfs = tabula.read_pdf(link, pages='all', multiple_tables=True)
+        print(dfs)
+        #return dfs
+
+
 if __name__ == "__main__":
     ex = DataExtractor()
-    ex.read_rds_table()
+    ex.retrieve_pdf_data(link=any)
