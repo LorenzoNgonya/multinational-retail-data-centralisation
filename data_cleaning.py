@@ -29,24 +29,31 @@ class DataCleaning():
         table['join_date'] = pd.to_datetime(table['join_date'], errors='coerce')
         table = table.dropna(subset=['join_date'])
         # Check datetime formate
-        pd.to_datetime(table['join_date'], format='%Y-%M-%d', errors='raise')
+        pd.to_datetime(table['join_date'], format='%Y-%M-%D', errors='raise')
 
         print(table['country'].unique())
         print(table)
         
-        db_conn = DatabaseConnector()
-        db_conn.upload_to_db('dim_users', table)
-
-        def clean_card_data(self):
-            file = DataExtractor().retreve_pdf_data()
-            table = pd.DataFrame()
-            for item in file:
-                table = pd.concat([table, item],ignore_index=True)
         
+
+    def clean_card_data(self):
+        file = DataExtractor().retrieve_pdf_data()
+        table = pd.DataFrame()
+        for item in file:
+            table = pd.concat([table, item],ignore_index=True)
+        print (table)
+        table.dropna(axis=0, how='all', inplace=True)
+        table.dropna(axis=1, how='all', inplace=True)
+        table = table.drop_duplicates(keep='first')
+        #duplicated_rows = table.duplicated().sum()
+        #if duplicated_rows == 0:
+            #print(f'{duplicated_rows} duplicate rows found')
+        db_conn = DatabaseConnector()
+        db_conn.upload_to_db('dim_card_details', table)
 
 if __name__ == "__main__":
     clean = DataCleaning()
-    clean.clean_user_data()
+    clean.clean_card_data()
     
     
     
