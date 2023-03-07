@@ -1,6 +1,8 @@
 from database_utils import DatabaseConnector
 import pandas as pd
 import tabula
+import requests
+import json
 
 class DataExtractor:
     def read_rds_table(self, db_con = DatabaseConnector()):
@@ -14,7 +16,31 @@ class DataExtractor:
         dfs = tabula.read_pdf(address, pages='all')
         return dfs
 
+    def list_number_of_stores(self,):
+        dictionary = {'x-api-key':'yFBQbwXe9J3sd6zWVAMrK6lcxxr0q1lr2PT6DDMX'}
+        stores = requests.get('https://aqj7u5id95.execute-api.eu-west-1.amazonaws.com/prod/number_stores',headers=dictionary)
+        store_number = stores.json()
+        return store_number
+
+
+    def retrieve_stores_data(self, endpoint='https://aqj7u5id95.execute-api.eu-west-1.amazonaws.com/prod/store_details'):
+        dict_list = []
+        dictionary = {'x-api-key':'yFBQbwXe9J3sd6zWVAMrK6lcxxr0q1lr2PT6DDMX'}
+        number_store = self.list_number_of_stores()
+        for num in range (451):
+            if num%10 == 0:
+                print(num,"/",number_store)
+            dict = requests.get(f'{endpoint}/{num}',headers=dictionary)
+            content = dict.json()
+            dict_list.append(content)
+        
+        dict = pd.DataFrame.from_dict(dict_list)
+        return dict
+        
+
+
+
 
 if __name__ == "__main__":
     ex = DataExtractor()
-    ex.retrieve_pdf_data()
+    ex.retrieve_stores_data()

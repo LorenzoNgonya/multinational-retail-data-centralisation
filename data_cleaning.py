@@ -48,12 +48,29 @@ class DataCleaning():
         #duplicated_rows = table.duplicated().sum()
         #if duplicated_rows == 0:
             #print(f'{duplicated_rows} duplicate rows found')
+
+
+    def clean_store_data(self):
+        store_data_instance = DataExtractor()
+        table = store_data_instance.retrieve_stores_data()
+        print (table)
+        # Clean up staff numbers, longitude and latitide columns
+        table[['staff_numbers', 'longitude', 'latitude']] = table[['staff_numbers', 'longitude', 'latitude']].apply(lambda x: round(pd.to_numeric(x, errors = 'coerce'), 1))
+        table.dropna(subset = ['staff_numbers'], inplace=True)
+        table = table.astype({'staff_numbers': 'int64'})
+
+        # Dropping nan values, redundant index column, lat column which contains little valid data and resetting index
+        table.drop(['index', 'lat'], axis = 1, inplace=True)
+        table.dropna(inplace = True, subset = ['store_code', 'store_type'])
+        table.drop_duplicates(inplace = True)
+        table.reset_index(drop = True, inplace=True)
+        
         db_conn = DatabaseConnector()
-        db_conn.upload_to_db('dim_card_details', table)
+        db_conn.upload_to_db('dim_store_details', table)
 
 if __name__ == "__main__":
     clean = DataCleaning()
-    clean.clean_card_data()
+    clean.clean_store_data()
     
     
     
