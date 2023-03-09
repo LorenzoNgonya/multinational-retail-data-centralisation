@@ -9,7 +9,7 @@ class DataExtractor:
     def read_rds_table(self, db_con = DatabaseConnector()):
      engine1 = db_con.init_db_engine()
      user_tb = db_con.list_db_tables()
-     user = pd.read_sql_table(user_tb[1],engine1)
+     user = pd.read_sql_table(user_tb[2],engine1)
      print(user.head)
      return user
 
@@ -53,4 +53,4 @@ class DataExtractor:
 
 if __name__ == "__main__":
     ex = DataExtractor()
-    ex.extract_from_s3()
+    ex.read_rds_table()

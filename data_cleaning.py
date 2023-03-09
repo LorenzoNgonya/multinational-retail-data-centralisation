@@ -129,14 +129,19 @@ class DataCleaning():
 
          return weight_table
 
-    
+    def clean_orders_data(self):
+        table = DataExtractor.read_rds_table('orders_table')
+        #print(table.columns)
+        table = table.drop(['first_name', 'last_name', '1', 'level_0', 'index'], axis=1)
+        print (table.info)
+
+        db_conn = DatabaseConnector()
+        db_conn.upload_to_db('orders_table', table)
 
 if __name__ == "__main__":
     clean = DataCleaning()
-    weight_table = clean.convert_product_weights()
-    clean.clean_products_data(weight_table)
-    db_conn = DatabaseConnector()
-    db_conn.upload_to_db('dim_products', weight_table)
+    clean.clean_orders_data()
+    
 
 
     # df_products = DataExtractor().extract_from_s3('s3://data-handling-public/products.csv')
