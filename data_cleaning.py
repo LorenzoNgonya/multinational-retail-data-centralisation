@@ -64,13 +64,46 @@ class DataCleaning():
         table.dropna(inplace = True, subset = ['store_code', 'store_type'])
         table.drop_duplicates(inplace = True)
         table.reset_index(drop = True, inplace=True)
+        return table
+
+    def convert_product_weights(self):
+        def convert_unit(x):
+            x = str(x)
+            if 'kg' == x[-2:]:
+                x = float(x[:-2]) * 1000
+                return x
+            elif 'g' == x[-1] and 'x' not in x:
+                x = float(x[:-1])
+                return x
+            elif 'g' == x[-1] and 'x' in x:
+                x = x[:-1].split('x')
+                return float(x[0]) * float(x[1])
+            else:
+                return 0
         
-        db_conn = DatabaseConnector()
-        db_conn.upload_to_db('dim_store_details', table)
+        product_weight = DataExtractor().extract_from_s3()
+
+        #drop NaN values
+        product_weight = product_weight.dropna(subset=['weight'])
+        product_weight=product_weight.copy()
+        
+        product_weight['weight(g)'] = product_weight['weight'].apply(convert_unit)
+        product_weight['ml'] = product_weight['weight'].apply(convert_unit)
+        return product_weight
+        
+    def clean_products_data(self, weight):
+        product_we
+
+        
+
+    #db_conn = DatabaseConnector()
+    #db_conn.upload_to_db('dim_store_details', product_weight)
 
 if __name__ == "__main__":
     clean = DataCleaning()
-    clean.clean_store_data()
-    
-    
-    
+    clean.convert_product_weights()
+    weight_table = clean.convert_product_weights()
+    isinstance.clean_products_data(weight_table)
+    DataClean().clean_product_data(DataClean().convert_product_weights(df_products))
+    # df_products = DataExtractor().extract_from_s3('s3://data-handling-public/products.csv')
+    # products = DataClean().clean_product_data(DataClean().convert_product_weights(df_products))       
