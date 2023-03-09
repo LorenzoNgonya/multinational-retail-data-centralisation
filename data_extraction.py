@@ -3,6 +3,7 @@ import pandas as pd
 import tabula
 import requests
 import json
+import boto3
 
 class DataExtractor:
     def read_rds_table(self, db_con = DatabaseConnector()):
@@ -36,11 +37,20 @@ class DataExtractor:
         
         dict = pd.DataFrame.from_dict(dict_list)
         return dict
-        
 
+    def extract_from_s3(self):
+        s3_client = boto3.client('s3')
+        bucket = 'data-handling-public'
+        object = 'products.csv'
+        file = 'products.csv'
+        s3_client.download_file(bucket,object,file)
+        table = pd.read_csv('./products.csv')
+        return table
+
+    
 
 
 
 if __name__ == "__main__":
     ex = DataExtractor()
-    ex.retrieve_stores_data()
+    ex.extract_from_s3()
