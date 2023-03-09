@@ -130,14 +130,15 @@ class DataCleaning():
         table = table.drop(['first_name', 'last_name', '1', 'level_0', 'index'], axis=1)
         print (table.info)
 
-    def clean_date_details(self):
-     table = DataExtractor.extract_from_s3_json()
-     duplicate = table.duplicated().sum()
-     null = table.isnull().sum()
+    def clean_date_details(self,df):
+     date_table = df.copy()
+     duplicate = date_table.duplicated().sum()
+     null = date_table.isnull().sum()
         #db_conn = DatabaseConnector()
         #db_conn.upload_to_db('orders_table', table)
 
 if __name__ == "__main__":
     clean = DataCleaning()
-    clean.clean_date_details()
+    date_table = DataExtractor.extract_from_s3_json()
+    clean.clean_date_details(date_table)
          
