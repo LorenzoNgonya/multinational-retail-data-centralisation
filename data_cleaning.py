@@ -3,7 +3,6 @@ from data_extraction import DataExtractor
 from database_utils import DatabaseConnector
 import numpy as np
 import re 
-
 class DataCleaning():
     def __init__(self) -> None:
         pass
@@ -35,8 +34,6 @@ class DataCleaning():
 
         print(table['country'].unique())
         print(table)
-        
-        
 
     def clean_card_data(self):
         file = DataExtractor().retrieve_pdf_data()
@@ -50,7 +47,6 @@ class DataCleaning():
         #duplicated_rows = table.duplicated().sum()
         #if duplicated_rows == 0:
             #print(f'{duplicated_rows} duplicate rows found')
-
 
     def clean_store_data(self):
         store_data_instance = DataExtractor()
@@ -94,7 +90,6 @@ class DataCleaning():
         return product_weight
         
     def clean_products_data(self, df):
-         
          weight_table = df.copy()
 
         # Verify category column against valid categories
@@ -135,14 +130,14 @@ class DataCleaning():
         table = table.drop(['first_name', 'last_name', '1', 'level_0', 'index'], axis=1)
         print (table.info)
 
-        db_conn = DatabaseConnector()
-        db_conn.upload_to_db('orders_table', table)
+    def clean_date_details(self):
+     table = DataExtractor.extract_from_s3_json()
+     duplicate = table.duplicated().sum()
+     null = table.isnull().sum()
+        #db_conn = DatabaseConnector()
+        #db_conn.upload_to_db('orders_table', table)
 
 if __name__ == "__main__":
     clean = DataCleaning()
-    clean.clean_orders_data()
-    
-
-
-    # df_products = DataExtractor().extract_from_s3('s3://data-handling-public/products.csv')
-    # products = DataClean().clean_product_data(DataClean().convert_product_weights(df_products))       
+    clean.clean_date_details()
+         

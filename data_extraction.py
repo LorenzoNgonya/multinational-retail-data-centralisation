@@ -47,10 +47,18 @@ class DataExtractor:
         table = pd.read_csv('./products.csv')
         return table
 
-    
+    def extract_from_s3_json(self):
+        #https://data-handling-public.s3.eu-west-1.amazonaws.com/date_details.json
+        s3_client = boto3.client('s3')
+        bucket = 'data-handling-public'
+        object = 'date_details.json'
+        file = 'date_details.json'
+        s3_client.download_file(bucket,object,file)
+        table = pd.read_json('./date_details.json')
+        return table
 
 
 
 if __name__ == "__main__":
     ex = DataExtractor()
-    ex.read_rds_table()
+    ex.extract_from_s3_json()
