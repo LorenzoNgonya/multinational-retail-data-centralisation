@@ -131,14 +131,46 @@ class DataCleaning():
         print (table.info)
 
     def clean_date_details(self,df):
-     date_table = df.copy()
-     duplicate = date_table.duplicated().sum()
-     null = date_table.isnull().sum()
-        #db_conn = DatabaseConnector()
-        #db_conn.upload_to_db('orders_table', table)
+
+         date_table = DataExtractor.extract_from_s3_json(self)
+
+         # allows null entries to recognised by pandas or numpy
+         date_table.replace('NULL', np.nan, inplace=True)
+
+         # Convert timestamp column to datatime.time format
+         date_table['timestamp'] = date_table['timestamp'].apply(lambda x: pd.to_datetime(x, format= '%H:%M:%S', errors = 'coerce')).dt.time
+
+         # Clean up months column by removing invalid entries
+         months = [*range(1,13)]
+         date_table.month = date_table.month.apply(lambda x: x if pd.to_numeric(x, errors='coerce') in months else np.nan)
+
+        # Clean up days column by removing invalid entries
+         days = [*range(1,32)]
+         date_table.day = date_table.day.apply(lambda x: x if pd.to_numeric(x, errors='coerce') in days else np.nan)
+
+        # Clean up years column by removing invalid entries
+         years = [*range(1980,2023)]
+         date_table.year = date_table.year.apply(lambda x: x if pd.to_numeric(x, errors='coerce') in years else np.nan)
+
+        # Clean up user uuid column by removing entries of invalid length
+         date_table.date_uuid = date_table.date_uuid.apply(lambda x: x if re.match('^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$', str(x)) else np.nan)
+
+        # Clean up periods column by removing invalid entries
+         periods = ['Morning', 'Midday', 'Evening', 'Late_Hours']
+         date_table.time_period = date_table.time_period.apply(lambda x: x if x in periods else np.nan)
+
+         # Remove nan values, duplicates and reset index
+         date_table.dropna(inplace = True, subset=['date_uuid']) # currently keep all rows to avoid over-cleaning
+         date_table.drop_duplicates(inplace=True)
+         date_table.reset_index(drop=True, inplace=True)
+
+         return date_table
+
+         
 
 if __name__ == "__main__":
+     
     clean = DataCleaning()
-    date_table = DataExtractor.extract_from_s3_json()
-    clean.clean_date_details(date_table)
-         
+    date_table = clean.clean_date_details(df=DataExtractor.extract_from_s3_json)
+    db_conn = DatabaseConnector()
+    db_conn.upload_to_db('dim_dates_times', date_table)
