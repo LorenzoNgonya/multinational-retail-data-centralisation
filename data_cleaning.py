@@ -1,6 +1,8 @@
 import pandas as pd
 from data_extraction import DataExtractor
 from database_utils import DatabaseConnector
+import numpy as np
+import re 
 
 class DataCleaning():
     def __init__(self) -> None:
@@ -91,19 +93,51 @@ class DataCleaning():
         product_weight['ml'] = product_weight['weight'].apply(convert_unit)
         return product_weight
         
-    def clean_products_data(self, weight):
-        product_we
+    def clean_products_data(self, df):
+         
+         weight_table = df.copy()
 
-        
+        # Verify category column against valid categories
+         categories = ['homeware', 'toys-and-games', 'food-and-drink', 'pets', 'sports-and-leisure', 'health-and-beauty', 'diy']
+         weight_table.category =  weight_table.category.apply(lambda x: x if x in categories else np.nan)
 
-    #db_conn = DatabaseConnector()
-    #db_conn.upload_to_db('dim_store_details', product_weight)
+        # Verify removed column against valid availability categories
+         availability = ['Still_avaliable', 'Removed']
+         weight_table.removed = weight_table.removed.apply(lambda x: x if x in availability else np.nan).replace('Still_avaliable', 'Still_available')
+
+        # Convert date added column entries to datetime date type
+         weight_table.date_added = weight_table.date_added.apply(lambda x: pd.to_datetime(x, format = '%Y-%m-%d' , errors = 'coerce'))
+
+        # Conveert price column to numeric data
+         weight_table.product_price = weight_table.product_price.apply(lambda x: round(pd.to_numeric(str(x).strip('£'), errors='coerce'), 2))
+
+        # Verify that uuid column entires follow a specific format
+         weight_table.uuid = weight_table.uuid.apply(lambda x: x if re.match('^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$', str(x)) else np.nan)
+
+        # Verify that EAN column entries follow a specific format
+         weight_table.rename(columns = {'EAN': 'ean'}, inplace=True)
+         weight_table.ean = weight_table.ean.apply(lambda x: str(x) if re.match('^[0-9]{12,13}$', str(x)) else np.nan)
+         
+        # Verify that product_code column entries follow a specific format
+         weight_table.product_code = weight_table.product_code.apply(lambda x: x if re.match('^[a-zA-Z0-9]{2}-[0-9]{6,7}[a-zA-Z]$', str(x)) else np.nan)
+
+        # Delete unnecessary columns, nan entries and reset index (no duplicates confirmed)
+         weight_table.drop('Unnamed: 0', axis=1, inplace=True)
+         weight_table.dropna(inplace = True, subset=['product_code'])
+         weight_table.drop_duplicates(inplace=True)
+         weight_table.reset_index(drop=True, inplace=True)
+
+         return weight_table
+
+    
 
 if __name__ == "__main__":
     clean = DataCleaning()
-    clean.convert_product_weights()
     weight_table = clean.convert_product_weights()
-    isinstance.clean_products_data(weight_table)
-    DataClean().clean_product_data(DataClean().convert_product_weights(df_products))
+    clean.clean_products_data(weight_table)
+    db_conn = DatabaseConnector()
+    db_conn.upload_to_db('dim_products', weight_table)
+
+
     # df_products = DataExtractor().extract_from_s3('s3://data-handling-public/products.csv')
     # products = DataClean().clean_product_data(DataClean().convert_product_weights(df_products))       
