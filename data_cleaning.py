@@ -52,6 +52,30 @@ class DataCleaning():
         store_data_instance = DataExtractor()
         table = store_data_instance.retrieve_stores_data()
         print (table)
+
+        # Clean column with address
+        table.address = table.address.apply(lambda x: np.nan if len(str(x).split())==1 else x)
+
+        # Clean column with opening date
+        table.opening_date = table.opening_date.apply(lambda x: pd.to_datetime(x, format = '%Y-%m-%d' , errors = 'coerce')).dt.date
+
+         # Clean up continent column
+        continents = ['Europe', 'America']
+        table.continent = table.continent.apply(lambda x: x if x in continents else('Europe' if 'Europe' in str(x) else('America' if 'America' in str(x) else np.nan)))
+
+        # Clean up country code column
+        country_codes = ['GB', 'US', 'DE']
+        table.country_code = table.country_code.apply(lambda x: x if x in country_codes else np.nan)
+
+        # Clean up store type column
+        store_types = ['Local', 'Super Store', 'Mall Kiosk', 'Outlet', 'Web Portal']
+        table.store_type = table.store_type.apply(lambda x: x if x in store_types else np.nan)
+
+        # Clean column with locality    
+        table.locality.replace('[\d]', np.nan, regex=True, inplace=True)
+
+        # Check store_code against specific format
+        table.store_code = table.store_code.apply(lambda x: x if re.match('^[A-Z]{2,3}-[A-Z0-9]{8}$', str(x)) else np.nan)
         # Clean up staff numbers, longitude and latitide columns
         table[['staff_numbers', 'longitude', 'latitude']] = table[['staff_numbers', 'longitude', 'latitude']].apply(lambda x: round(pd.to_numeric(x, errors = 'coerce'), 1))
         table.dropna(subset = ['staff_numbers'], inplace=True)
@@ -171,6 +195,6 @@ class DataCleaning():
 if __name__ == "__main__":
      
     clean = DataCleaning()
-    date_table = clean.clean_date_details(df=DataExtractor.extract_from_s3_json)
+    date_table = clean.clean_date_details(df=DataExtractor.retrieve_stores_data)
     db_conn = DatabaseConnector()
-    db_conn.upload_to_db('dim_dates_times', date_table)
+    db_conn.upload_to_db('dim_store_times', date_table)
