@@ -42,7 +42,7 @@ class DatabaseConnector:
         else:
             engine = self.init_db_engine()
 
-        df.to_sql(table_name, engine, if_exists = 'append')
+        df.to_sql(table_name, engine, if_exists = 'replace')
         
 
 
