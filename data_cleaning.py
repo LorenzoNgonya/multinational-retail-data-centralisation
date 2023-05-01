@@ -195,6 +195,6 @@ class DataCleaning():
 if __name__ == "__main__":
      
     clean = DataCleaning()
-    date_table = clean.clean_date_details(df=DataExtractor.retrieve_stores_data)
+    table = clean.clean_store_data()
     db_conn = DatabaseConnector()
-    db_conn.upload_to_db('dim_store_times', date_table)
+    db_conn.upload_to_db('dim_store_details', table)
