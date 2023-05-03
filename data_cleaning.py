@@ -89,29 +89,21 @@ class DataCleaning():
         return table
 
     def convert_product_weights(self):
-        def convert_unit(x):
-            x = str(x)
-            if 'kg' == x[-2:]:
-                x = float(x[:-2]) * 1000
-                return x
-            elif 'g' == x[-1] and 'x' not in x:
-                x = float(x[:-1])
-                return x
-            elif 'g' == x[-1] and 'x' in x:
-                x = x[:-1].split('x')
-                return float(x[0]) * float(x[1])
-            else:
-                return 0
         
-        product_weight = DataExtractor().extract_from_s3()
+        products = DataExtractor().extract_from_s3()
+        products.weight =  products.weight.apply(lambda x: str(x)[: (str(x).index('g')+1)] if 'g' in str(x) else x)
 
-        #drop NaN values
-        product_weight = product_weight.dropna(subset=['weight'])
-        product_weight=product_weight.copy()
-        
-        product_weight['weight(g)'] = product_weight['weight'].apply(convert_unit)
-        product_weight['ml'] = product_weight['weight'].apply(convert_unit)
-        return product_weight
+        products.weight =  products.weight.apply(lambda x:
+        pd.to_numeric(str(x)[:-2], errors = 'coerce') if str(x)[-2:] == 'kg' else
+        (0.001*pd.to_numeric(str(x).strip('g').split(' ')[0]) * pd.to_numeric(str(x).strip('g').split(' ')[-1]) if ('x' in str(x) and str(x)[-1] == 'g') else 
+        (0.001*pd.to_numeric(str(x)[:-1], errors = 'coerce') if str(x)[-1] == 'g' else
+        (0.001*pd.to_numeric(str(x)[:-2], errors = 'coerce') if str(x)[-2:] == 'ml' else
+        (0.0284*pd.to_numeric(str(x)[:-2], errors = 'coerce') if str(x)[-2:] == 'oz' else 
+        np.nan)))))
+
+        products.weight =  products.weight.apply(lambda x: round(x, 2))
+
+        return products
         
     def clean_products_data(self, df):
          weight_table = df.copy()
@@ -195,6 +187,9 @@ class DataCleaning():
 if __name__ == "__main__":
      
     clean = DataCleaning()
-    table = clean.clean_store_data()
+    table = clean.convert_product_weights()
+    clean.clean_products_data(table)
     db_conn = DatabaseConnector()
-    db_conn.upload_to_db('dim_store_details', table)
+    db_conn.upload_to_db('dim_products', table)
+    #weight_db=clean.clean_products_data(table)
+   # weight_db.to_string('clean_product_df.txt')
