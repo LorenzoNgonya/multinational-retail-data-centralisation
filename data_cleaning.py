@@ -146,7 +146,7 @@ class DataCleaning():
         table = table.drop(['first_name', 'last_name', '1', 'level_0', 'index'], axis=1)
         print (table.info)
 
-    def clean_date_details(self,df):
+    def clean_date_details(self):
 
          date_table = DataExtractor.extract_from_s3_json(self)
 
@@ -187,9 +187,8 @@ class DataCleaning():
 if __name__ == "__main__":
      
     clean = DataCleaning()
-    table = clean.convert_product_weights()
-    clean.clean_products_data(table)
+    table = clean.clean_date_details()
     db_conn = DatabaseConnector()
-    db_conn.upload_to_db('dim_products', table)
+    db_conn.upload_to_db('dim_date_times', table)
     #weight_db=clean.clean_products_data(table)
    # weight_db.to_string('clean_product_df.txt')
