@@ -61,4 +61,4 @@ class DataExtractor:
 
 if __name__ == "__main__":
     ex = DataExtractor()
-    ex.extract_from_s3_json()
+    ex.retrieve_stores_data()

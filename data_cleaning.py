@@ -75,7 +75,8 @@ class DataCleaning():
         table.locality.replace('[\d]', np.nan, regex=True, inplace=True)
 
         # Check store_code against specific format
-        table.store_code = table.store_code.apply(lambda x: x if re.match('^[A-Z]{2,3}-[A-Z0-9]{8}$', str(x)) else np.nan)
+        #table.store_code = table.store_code.apply(lambda x: x if re.match('^[A-Z]{2,3}-[A-Z0-9]{8}$', str(x)) else np.nan)
+        
         # Clean up staff numbers, longitude and latitide columns
         table[['staff_numbers', 'longitude', 'latitude']] = table[['staff_numbers', 'longitude', 'latitude']].apply(lambda x: round(pd.to_numeric(x, errors = 'coerce'), 1))
         table.dropna(subset = ['staff_numbers'], inplace=True)
@@ -83,8 +84,8 @@ class DataCleaning():
 
         # Dropping nan values, redundant index column, lat column which contains little valid data and resetting index
         table.drop(['index', 'lat'], axis = 1, inplace=True)
-        table.dropna(inplace = True, subset = ['store_code', 'store_type'])
-        table.drop_duplicates(inplace = True)
+        #table.dropna(inplace = True, subset = ['store_code', 'store_type'])
+        #table.drop_duplicates(inplace = True)
         table.reset_index(drop = True, inplace=True)
         return table
 
@@ -144,6 +145,7 @@ class DataCleaning():
         table = DataExtractor.read_rds_table('orders_table')
         #print(table.columns)
         table = table.drop(['first_name', 'last_name', '1', 'level_0', 'index'], axis=1)
+        table = table.to_string('clean_orders_data.txt')
         print (table.info)
 
     def clean_date_details(self):
@@ -187,8 +189,9 @@ class DataCleaning():
 if __name__ == "__main__":
      
     clean = DataCleaning()
-    table = clean.clean_date_details()
+    table = clean.clean_store_data()
+    #table.to_string('clean_orders_data.txt')
     db_conn = DatabaseConnector()
-    db_conn.upload_to_db('dim_date_times', table)
+    db_conn.upload_to_db('dim_store_details', table)
     #weight_db=clean.clean_products_data(table)
-   # weight_db.to_string('clean_product_df.txt')
+   # weight_db.to_string('clean_store_data.txt')
