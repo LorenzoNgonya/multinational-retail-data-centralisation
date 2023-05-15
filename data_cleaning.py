@@ -53,40 +53,40 @@ class DataCleaning():
         table = store_data_instance.retrieve_stores_data()
         print (table)
 
-        # Clean column with address
-        table.address = table.address.apply(lambda x: np.nan if len(str(x).split())==1 else x)
+        #Clean column with address
+       # table.address = table.address.apply(lambda x: np.nan if len(str(x).split())==1 else x)
 
         # Clean column with opening date
-        table.opening_date = table.opening_date.apply(lambda x: pd.to_datetime(x, format = '%Y-%m-%d' , errors = 'coerce')).dt.date
+       # table.opening_date = table.opening_date.apply(lambda x: pd.to_datetime(x, format = '%Y-%m-%d' , errors = 'coerce')).dt.date
 
-         # Clean up continent column
-        continents = ['Europe', 'America']
-        table.continent = table.continent.apply(lambda x: x if x in continents else('Europe' if 'Europe' in str(x) else('America' if 'America' in str(x) else np.nan)))
+        # Clean up continent column
+       #continents = ['Europe', 'America']
+       # table.continent = table.continent.apply(lambda x: x if x in continents else('Europe' if 'Europe' in str(x) else('America' if 'America' in str(x) else np.nan)))
 
         # Clean up country code column
-        country_codes = ['GB', 'US', 'DE']
-        table.country_code = table.country_code.apply(lambda x: x if x in country_codes else np.nan)
+       ########### country_codes = ['GB', 'US', 'DE']
+       ######### table.country_code = table.country_code.apply(lambda x: x if x in country_codes else np.nan)
 
         # Clean up store type column
-        store_types = ['Local', 'Super Store', 'Mall Kiosk', 'Outlet', 'Web Portal']
-        table.store_type = table.store_type.apply(lambda x: x if x in store_types else np.nan)
+        # store_types = ['Local', 'Super Store', 'Mall Kiosk', 'Outlet', 'Web Portal']
+       # table.store_type = table.store_type.apply(lambda x: x if x in store_types else np.nan)
 
         # Clean column with locality    
-        table.locality.replace('[\d]', np.nan, regex=True, inplace=True)
+       ####### table.locality.replace('[\d]', np.nan, regex=True, inplace=True)
 
-        # Check store_code against specific format
+       ###### # Check store_code against specific format
         #table.store_code = table.store_code.apply(lambda x: x if re.match('^[A-Z]{2,3}-[A-Z0-9]{8}$', str(x)) else np.nan)
-        
+       ##### 
         # Clean up staff numbers, longitude and latitide columns
-        table[['staff_numbers', 'longitude', 'latitude']] = table[['staff_numbers', 'longitude', 'latitude']].apply(lambda x: round(pd.to_numeric(x, errors = 'coerce'), 1))
-        table.dropna(subset = ['staff_numbers'], inplace=True)
-        table = table.astype({'staff_numbers': 'int64'})
+      ####  table[['staff_numbers', 'longitude', 'latitude']] = table[['staff_numbers', 'longitude', 'latitude']].apply(lambda x: round(pd.to_numeric(x, errors = 'coerce'), 1))
+      ###  table.dropna(subset = ['staff_numbers'], inplace=True)
+        #table = table.astype({'staff_numbers': 'int64'})
 
         # Dropping nan values, redundant index column, lat column which contains little valid data and resetting index
-        table.drop(['index', 'lat'], axis = 1, inplace=True)
+       # table.drop(['index', 'lat'], axis = 1, inplace=True)
         #table.dropna(inplace = True, subset = ['store_code', 'store_type'])
         #table.drop_duplicates(inplace = True)
-        table.reset_index(drop = True, inplace=True)
+       # table.reset_index(drop = True, inplace=True)
         return table
 
     def convert_product_weights(self):
@@ -190,8 +190,8 @@ if __name__ == "__main__":
      
     clean = DataCleaning()
     table = clean.clean_store_data()
-    #table.to_string('clean_orders_data.txt')
+    table.to_string('clean_stores_data.txt')
     db_conn = DatabaseConnector()
-    db_conn.upload_to_db('dim_store_details', table)
+    #db_conn.upload_to_db('dim_store_details', table)
     #weight_db=clean.clean_products_data(table)
    # weight_db.to_string('clean_store_data.txt')

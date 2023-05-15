@@ -19,21 +19,24 @@ class DataExtractor:
 
     def list_number_of_stores(self,):
         dictionary = {'x-api-key':'yFBQbwXe9J3sd6zWVAMrK6lcxxr0q1lr2PT6DDMX'}
-        stores = requests.get('https://aqj7u5id95.execute-api.eu-west-1.amazonaws.com/prod/number_stores',headers=dictionary)
-        store_number = stores.json()
-        return store_number
+        stores = requests.get('https://aqj7u5id95.execute-api.eu-west-1.amazonaws.com/prod/number_stores',headers=dictionary).content
+        store_number = json.loads(stores)
+        print(stores)
+        print(store_number)
+        return store_number['number_stores']
 
 
     def retrieve_stores_data(self, endpoint='https://aqj7u5id95.execute-api.eu-west-1.amazonaws.com/prod/store_details'):
         dict_list = []
         dictionary = {'x-api-key':'yFBQbwXe9J3sd6zWVAMrK6lcxxr0q1lr2PT6DDMX'}
         number_store = self.list_number_of_stores()
-        for num in range (451):
-            if num%10 == 0:
-                print(num,"/",number_store)
+        for num in range(0,number_store):
+            #if num%10 == 0:
+                #print(num,"/",number_store)
             dict = requests.get(f'{endpoint}/{num}',headers=dictionary)
             content = dict.json()
             dict_list.append(content)
+            print (num)
         
         dict = pd.DataFrame.from_dict(dict_list)
         return dict
