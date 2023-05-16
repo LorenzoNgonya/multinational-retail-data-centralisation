@@ -36,17 +36,18 @@ class DataCleaning():
         print(table)
 
     def clean_card_data(self):
-        file = DataExtractor().retrieve_pdf_data()
+        table = DataExtractor().retrieve_pdf_data()
         table = pd.DataFrame()
-        for item in file:
-            table = pd.concat([table, item],ignore_index=True)
         print (table)
-        table.dropna(axis=0, how='all', inplace=True)
-        table.dropna(axis=1, how='all', inplace=True)
-        table = table.drop_duplicates(keep='first')
+        
+        #table.dropna(axis=0, how='all', inplace=True)
+        #table.dropna(axis=1, how='all', inplace=True)
+        #table = table.drop_duplicates(keep='first')
         #duplicated_rows = table.duplicated().sum()
         #if duplicated_rows == 0:
             #print(f'{duplicated_rows} duplicate rows found')
+         
+        return table
 
     def clean_table(self):
         table_instance = DataExtractor()
@@ -193,9 +194,9 @@ class DataCleaning():
 if __name__ == "__main__":
      
     clean = DataCleaning()
-    table = clean.clean_table()
-    table.to_string('clean_stores_data.txt')
-    db_conn = DatabaseConnector()
-    db_conn.upload_to_db('dim_store_details', table)
+    table = clean.clean_card_data()
+    table.to_string('clean_card_data.txt')
+    #db_conn = DatabaseConnector()
+    #db_conn.upload_to_db('dim_store_details', table)
     #weight_db=clean.clean_products_data(table)
    # weight_db.to_string('clean_table.txt')

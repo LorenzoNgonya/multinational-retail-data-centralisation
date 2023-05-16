@@ -14,7 +14,9 @@ class DataExtractor:
      return user
 
     def retrieve_pdf_data(self, address='card_details.pdf'):
-        dfs = tabula.read_pdf(address, pages='all')
+        pdf_path = "https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf"
+        dfs = tabula.read_pdf(pdf_path, stream =True, pages = 'all')
+        dfs = pd.concat(tabula.read_pdf(pdf_path, pages='all'), ignore_index=True)
         return dfs
 
     def list_number_of_stores(self,):
@@ -64,4 +66,4 @@ class DataExtractor:
 
 if __name__ == "__main__":
     ex = DataExtractor()
-    ex.retrieve_stores_data()
+    ex.retrieve_pdf_data()
