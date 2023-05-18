@@ -46,11 +46,11 @@ class DataCleaning():
         table['card_number'] = table['card_number'].apply(lambda x: str(x) )
         table['card_number'] = table['card_number'].apply(lambda x: x.strip('?') if '?' in x else x)
         #converts the date strings to ISO date format
-        table['date_payment_confirmed'] = pd.to_datetime(table['date_payment_confirmed'], format='%Y-%m-%d', errors='coerce')
-        table = table[table['date_payment_confirmed'].notnull()]
-        table['expiry_date'] = pd.to_datetime(table['expiry_date'], format='%m/%y', errors= 'coerce') 
-        table = table[table['expiry_date'].notnull()]
-        table['expiry_date'] = table['expiry_date'].dt.strftime('%m/%y')
+        table['date_payment_confirmed'] = pd.to_datetime(table['date_payment_confirmed'])
+        table['date_payment_confirmed'].dt.strftime('%Y-%m-%d')
+        table['card_number'] = table['card_number'].str.strip('?')
+        table['expiry_date'] = pd.to_datetime(table['expiry_date'],format = '%m/%y')
+
         card_number_validated = table['card_number'].str.fullmatch("[0-9]+")
         table = table[card_number_validated]
         table['card_number'] = table['card_number'].astype('int')
@@ -58,8 +58,6 @@ class DataCleaning():
         table.dropna(inplace=True, subset=['card_number'])
         table.dropna(axis=0, how='all', inplace=True)
         table.dropna(axis=1, how='all', inplace=True)
-        table.reset_index(drop=True, inplace=True)
-        
 
         table = table.drop_duplicates(keep='first')
         duplicated_rows = table.duplicated().sum()
