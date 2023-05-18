@@ -13,10 +13,11 @@ class DataExtractor:
      print(user.head)
      return user
 
-    def retrieve_pdf_data(self, address='card_details.pdf'):
+    def retrieve_pdf_data(self):
         pdf_path = "https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf"
-        dfs = tabula.read_pdf(pdf_path, stream =True, pages = 'all')
-        dfs = pd.concat(tabula.read_pdf(pdf_path, pages='all'), ignore_index=True)
+        dfs = tabula.read_pdf(pdf_path, pages = 'all')
+        dfs = pd.concat(dfs)
+        dfs.to_csv('card_details.csv')
         return dfs
 
     def list_number_of_stores(self,):

@@ -35,17 +35,36 @@ class DataCleaning():
         print(table['country'].unique())
         print(table)
 
-    def clean_card_data(self):
-        table = DataExtractor().retrieve_pdf_data()
-        table = pd.DataFrame()
-        print (table)
+    def clean_card_table(self):
+        table = pd.read_csv("card_details.csv")
+
+        # Check card providers are valid and corresponding number of digits in the card number is correct
+        providers = {'VISA 13 digit': [13], 'VISA 16 digit': [16], 'VISA 19 digit': [19], 'JCB 15 digit': [15], 'JCB 16 digit': [16], 'Discover': [16], 'Mastercard': [16], 'Maestro': range(12, 21), 'American Express': [15], 'Diners Club / Carte Blanche': [14]}
+        table['card_provider'] = table['card_provider'].apply(lambda x: x if x in providers else np.nan)
+        table.dropna(inplace=True, subset = ['card_provider']) 
+        # removes '?' from card_number
+        table['card_number'] = table['card_number'].apply(lambda x: str(x) )
+        table['card_number'] = table['card_number'].apply(lambda x: x.strip('?') if '?' in x else x)
+        #converts the date strings to ISO date format
+        table['date_payment_confirmed'] = pd.to_datetime(table['date_payment_confirmed'], format='%Y-%m-%d', errors='coerce')
+        table = table[table['date_payment_confirmed'].notnull()]
+        table['expiry_date'] = pd.to_datetime(table['expiry_date'], format='%m/%y', errors= 'coerce') 
+        table = table[table['expiry_date'].notnull()]
+        table['expiry_date'] = table['expiry_date'].dt.strftime('%m/%y')
+        card_number_validated = table['card_number'].str.fullmatch("[0-9]+")
+        table = table[card_number_validated]
+        table['card_number'] = table['card_number'].astype('int')
+
+        table.dropna(inplace=True, subset=['card_number'])
+        table.dropna(axis=0, how='all', inplace=True)
+        table.dropna(axis=1, how='all', inplace=True)
+        table.reset_index(drop=True, inplace=True)
         
-        #table.dropna(axis=0, how='all', inplace=True)
-        #table.dropna(axis=1, how='all', inplace=True)
-        #table = table.drop_duplicates(keep='first')
-        #duplicated_rows = table.duplicated().sum()
-        #if duplicated_rows == 0:
-            #print(f'{duplicated_rows} duplicate rows found')
+
+        table = table.drop_duplicates(keep='first')
+        duplicated_rows = table.duplicated().sum()
+        if duplicated_rows == 0:
+            print(f'{duplicated_rows} duplicate rows found')
          
         return table
 
@@ -194,9 +213,9 @@ class DataCleaning():
 if __name__ == "__main__":
      
     clean = DataCleaning()
-    table = clean.clean_card_data()
-    table.to_string('clean_card_data.txt')
-    #db_conn = DatabaseConnector()
-    #db_conn.upload_to_db('dim_store_details', table)
+    table = clean.clean_card_table()
+    #table.to_string('card_details.txt')
+    db_conn = DatabaseConnector()
+    db_conn.upload_to_db('dim_card_details', table)
     #weight_db=clean.clean_products_data(table)
    # weight_db.to_string('clean_table.txt')
