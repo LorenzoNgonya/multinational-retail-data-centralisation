@@ -216,4 +216,4 @@ if __name__ == "__main__":
     db_conn = DatabaseConnector()
     db_conn.upload_to_db('dim_card_details', table)
     #weight_db=clean.clean_products_data(table)
-   # weight_db.to_string('clean_table.txt')
+    #weight_db.to_string('clean_table.txt')
