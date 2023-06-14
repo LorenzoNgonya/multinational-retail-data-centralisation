@@ -44,7 +44,7 @@ The repository comprises several files:
 3. data_cleaning.py:
 - Contains the DataClean class responsible for cleaning the data.
 - Provides methods to clean specific dataframes (users, cards, stores, products, orders, dates), handling tasks such as handling null values, data format verification, converting data types, removing redundant columns, removing rows with NaN values, removing duplicates, and resetting the index.
--Additionally, there is a method to clean weight data specifically in the products database.
+- Additionally, there is a method to clean weight data specifically in the products database.
 
 4. data_main.py:
 - Executes the code from the other files.
